@@ -14,11 +14,6 @@ esse é o novo:
       width: 100%;
       height: 100vh;
     }
-    tableau-viz {
-      width: 100%;
-      height: 100vh;
-      border: none;
-    }
   </style>
   <link rel="icon" href="https://raizzcapital.com.br/wp-content/uploads/2024/02/logo-raizz-capital-fundo-branco.webp">
 </head>
@@ -27,8 +22,9 @@ esse é o novo:
 
   <script>
     const backendURL = "https://tableau-backend-h83x.onrender.com/get_tableau_url?painel=novos";
+    
     const dashboardNames = ["Geral", "Tarefas Especulativo", "Tarefas BTS"];
-    const tempoPorPainel = 60000;
+    const tempoPorPainel = 60000; 
     let currentDashboardIndex = 0;
     let vizElement = null;
 
@@ -43,20 +39,20 @@ esse é o novo:
         }
 
         const { embed_url, jwt } = data;
-        console.log("URL autenticada recebida:", embed_url);
-
+        console.log("✅ URL autenticada recebida:", embed_url);
+        
         const container = document.getElementById("vizContainer");
         container.innerHTML = "";
         vizElement = document.createElement("tableau-viz");
         vizElement.src = embed_url;
-        vizElement.token = jwt;
+        vizElement.token = jwt; 
         vizElement.toolbar = "hidden";
         vizElement.hideTabs = true;
         container.appendChild(vizElement);
 
         iniciarCiclo();
       } catch (error) {
-        console.error("Erro ao inicializar o Tableau:", error);
+        console.error("❌ Erro ao inicializar o Tableau:", error);
       }
     }
 
