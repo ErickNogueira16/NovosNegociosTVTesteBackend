@@ -37,7 +37,7 @@
         }
 
         const { embed_url, jwt } = data;
-        console.log("✅ URL autenticada recebida:", embed_url);
+        console.log("URL autenticada recebida:", embed_url);
         
         const container = document.getElementById("vizContainer");
         container.innerHTML = "";
@@ -50,7 +50,7 @@
 
         iniciarCiclo();
       } catch (error) {
-        console.error("❌ Erro ao inicializar o Tableau:", error);
+        console.error("Erro ao inicializar o Tableau:", error);
       }
     }
 
@@ -74,7 +74,7 @@
 
     carregarViz();
 
-    setTimeout(() => location.reload(true), 900000);
+    setTimeout(() => location.reload(true), 480000);
   </script>
 </body>
 </html>
