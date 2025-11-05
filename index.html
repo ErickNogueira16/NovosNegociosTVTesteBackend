@@ -8,7 +8,6 @@
     #vizContainer { width: 100%; height: 100vh; }
     tableau-viz { width: 100%; height: 100vh; border: none; }
   </style>
-  <link rel="icon" href="https://raizzcapital.com.br/wp-content/uploads/2024/02/logo-raizz-capital-fundo-branco.webp">
 </head>
 <body>
   <div id="vizContainer"></div>
@@ -16,46 +15,69 @@
   <script>
     const backendURL = "https://tableau-backend-h83x.onrender.com/get_tableau_url?painel=novos";
 
+    // Map com nomes visíveis e slugs corretos baseados nos links que você mandou
     const dashboards = [
-      { nome: "Geral", view: "Geral" },
+      { nome: "Geral", view: "Especulativo" }, // **ATENÇÃO**: no link você mandou “Especulativo” para o primeiro
       { nome: "Tarefas Especulativo", view: "TarefasEspeculativo" },
       { nome: "Tarefas BTS", view: "TarefasBTS" }
     ];
 
-    const tempoPorPainel = 10000;
+    const tempoPorPainel = 60000;
     let currentIndex = 0;
     let vizElement = null;
-    let baseUrl = "";
 
-    async function carregarViz() {
-      const { embed_url, jwt } = await (await fetch(backendURL)).json();
-      baseUrl = embed_url.split("/views/")[0] + "/views/TVNovosNegcios-RaizzCapital/";
-      criarViz(dashboards[currentIndex].view, jwt);
-      setInterval(trocarPainel, tempoPorPainel);
+    async function fetchToken() {
+      const resp = await fetch(backendURL);
+      if (!resp.ok) throw new Error("Erro backend: " + resp.status);
+      return resp.json();
     }
 
-    function criarViz(view, jwt) {
+    function buildEmbedUrl(embed_url, viewSlug) {
+      const parts = embed_url.split("/views/");
+      const prefix = parts[0] + "/views/";
+      const after = parts[1] || "";
+      const workbookSegment = after.split("/")[0];
+      const params = embed_url.includes("?:") ? embed_url.substring(embed_url.indexOf("?:")) : "";
+      return `${prefix}${workbookSegment}/${viewSlug}${params}`;
+    }
+
+    async function criarViz(viewSlug, jwt, embed_url) {
       const container = document.getElementById("vizContainer");
       container.innerHTML = "";
+      const urlEmbed = buildEmbedUrl(embed_url, viewSlug);
+
       vizElement = document.createElement("tableau-viz");
-      vizElement.src = `${baseUrl}${view}?:embed=yes&:showAppBanner=false`;
+      vizElement.src = urlEmbed;
       vizElement.token = jwt;
       vizElement.toolbar = "hidden";
       vizElement.hideTabs = true;
       container.appendChild(vizElement);
-      console.log("Painel carregado:", view);
+
+      console.log("Carregado painel viewSlug:", viewSlug, urlEmbed);
+      vizElement.addEventListener("firstinteractive", () => {
+        console.log("✅ First interactive para", viewSlug);
+      });
     }
 
-    async function trocarPainel() {
-      currentIndex = (currentIndex + 1) % dashboards.length;
-      const { embed_url, jwt } = await (await fetch(backendURL)).json();
-      const novoPainel = dashboards[currentIndex];
-      criarViz(novoPainel.view, jwt);
-      console.log("🔁 Painel trocado para:", novoPainel.nome);
+    async function init() {
+      try {
+        const { embed_url, jwt } = await fetchToken();
+        await criarViz(dashboards[currentIndex].view, jwt, embed_url);
+
+        setInterval(async () => {
+          currentIndex = (currentIndex + 1) % dashboards.length;
+          const painel = dashboards[currentIndex];
+          const tokenData = await fetchToken();
+          await criarViz(painel.view, tokenData.jwt, tokenData.embed_url);
+          console.log("🔁 Trocou para:", painel.nome);
+        }, tempoPorPainel);
+
+      } catch (error) {
+        console.error("Erro init Novos Negócios:", error);
+      }
     }
 
-    carregarViz();
-    setTimeout(() => location.reload(true), 480000);
+    init();
   </script>
 </body>
 </html>
