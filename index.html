@@ -14,10 +14,8 @@
 
   <script>
     const backendURL = "https://tableau-backend-h83x.onrender.com/get_tableau_url?painel=novos";
-
-    // Map com nomes visíveis e slugs corretos baseados nos links que você mandou
     const dashboards = [
-      { nome: "Geral", view: "Especulativo" }, // **ATENÇÃO**: no link você mandou “Especulativo” para o primeiro
+      { nome: "Geral", view: "Especulativo" },
       { nome: "Tarefas Especulativo", view: "TarefasEspeculativo" },
       { nome: "Tarefas BTS", view: "TarefasBTS" }
     ];
@@ -55,7 +53,7 @@
 
       console.log("Carregado painel viewSlug:", viewSlug, urlEmbed);
       vizElement.addEventListener("firstinteractive", () => {
-        console.log("✅ First interactive para", viewSlug);
+        console.log("First interactive para", viewSlug);
       });
     }
 
@@ -69,7 +67,7 @@
           const painel = dashboards[currentIndex];
           const tokenData = await fetchToken();
           await criarViz(painel.view, tokenData.jwt, tokenData.embed_url);
-          console.log("🔁 Trocou para:", painel.nome);
+          console.log("Trocou para:", painel.nome);
         }, tempoPorPainel);
 
       } catch (error) {
