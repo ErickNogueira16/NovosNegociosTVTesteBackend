@@ -1,12 +1,24 @@
+esse é o novo:
+
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Raizz Capital - TV Captação</title>
+  <title>Raizz Capital - TV Novos Negócios</title>
   <script type="module" src="https://us-east-1.online.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
   <style>
-    * { margin: 0; padding: 0; }
-    #vizContainer { width: 100%; height: 100vh; }
-    tableau-viz { width: 100%; height: 100vh; border: none; }
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    #vizContainer {
+      width: 100%;
+      height: 100vh;
+    }
+    tableau-viz {
+      width: 100%;
+      height: 100vh;
+      border: none;
+    }
   </style>
   <link rel="icon" href="https://raizzcapital.com.br/wp-content/uploads/2024/02/logo-raizz-capital-fundo-branco.webp">
 </head>
@@ -14,12 +26,9 @@
   <div id="vizContainer"></div>
 
   <script>
-    // 🔗 URL do backend (Render)
-    const backendURL = "https://tableau-backend-h83x.onrender.com/get_tableau_url?painel=captacao";
-
-    // 🧭 Dashboards dentro do workbook
-    const dashboardNames = ["CAPTACAO | FII DESENV - III", "CAPTACAO | UBERLANDIA"];
-    const tempoPorPainel = 60000; // 60 segundos
+    const backendURL = "https://tableau-backend-h83x.onrender.com/get_tableau_url?painel=novos";
+    const dashboardNames = ["Geral", "Tarefas Especulativo", "Tarefas BTS"];
+    const tempoPorPainel = 60000;
     let currentDashboardIndex = 0;
     let vizElement = null;
 
@@ -34,21 +43,20 @@
         }
 
         const { embed_url, jwt } = data;
-        console.log("✅ URL autenticada recebida:", embed_url);
+        console.log("URL autenticada recebida:", embed_url);
 
-        // 🧩 Cria o componente <tableau-viz>
         const container = document.getElementById("vizContainer");
-        container.innerHTML = ""; // limpa o anterior
+        container.innerHTML = "";
         vizElement = document.createElement("tableau-viz");
         vizElement.src = embed_url;
-        vizElement.token = jwt; // passa o JWT
+        vizElement.token = jwt;
         vizElement.toolbar = "hidden";
         vizElement.hideTabs = true;
         container.appendChild(vizElement);
 
         iniciarCiclo();
       } catch (error) {
-        console.error("❌ Erro ao inicializar o Tableau:", error);
+        console.error("Erro ao inicializar o Tableau:", error);
       }
     }
 
@@ -59,23 +67,19 @@
     async function trocarPainel() {
       currentDashboardIndex = (currentDashboardIndex + 1) % dashboardNames.length;
 
-      // Pega nova URL autenticada
       const response = await fetch(backendURL);
       const data = await response.json();
       const { embed_url } = data;
 
       const painelAtual = dashboardNames[currentDashboardIndex];
-      // Normaliza o nome (remove espaços, barras, etc.)
-      const painelFormatado = painelAtual.replace(/[|]/g, "").replace(/\s+/g, "");
-      const novoUrl = embed_url.replace("CAPTACAOFIIDESENV-III", painelFormatado);
-
+      const novoUrl = embed_url.replace("Especulativo", painelAtual.replace(/\s+/g, ""));
+      
       vizElement.src = novoUrl;
-      console.log("🔁 Painel trocado para:", painelAtual);
+      console.log("Painel trocado para:", painelAtual);
     }
 
     carregarViz();
 
-    // 🔄 Recarrega a página a cada 15 minutos
     setTimeout(() => location.reload(true), 900000);
   </script>
 </body>
